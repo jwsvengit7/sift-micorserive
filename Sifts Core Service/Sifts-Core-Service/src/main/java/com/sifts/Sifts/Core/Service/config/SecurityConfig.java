@@ -3,6 +3,7 @@ package com.sifts.Sifts.Core.Service.config;
 
 
 import com.sifts.Sifts.Core.Service.security.JwtAuthFilter;
+import com.sifts.Sifts.Core.Service.security.JwtEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,14 +23,17 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
+    private final JwtEntryPoint jwtEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                     .csrf(AbstractHttpConfigurer::disable)
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(configurer -> configurer.authenticationEntryPoint(jwtEntryPoint))
                     .authorizeHttpRequests(authorize -> {
                         authorize.requestMatchers(
+                                "/api/core/login",
                                         "/v2/api-docs",
                                         "/v3/api-docs",
                                         "/v3/api-docs/**",

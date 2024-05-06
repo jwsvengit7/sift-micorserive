@@ -11,5 +11,6 @@ import lombok.*;
 public class CoreResponse {
     private Object data;
     private String token;
+    private String refrestToken;
 
 }
