@@ -64,4 +64,36 @@ public class Restemplates {
         }
         return restTemplate;
     }
+
+    public RestTemplate restTemplateAPIGateway()  {
+        String apiHost = customerServiceBaseUrl;
+
+        if (restTemplate == null) {
+            HttpHost httpHost = new HttpHost(apiHost);
+            PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+            connectionManager.setMaxTotal(maxConnections);
+            connectionManager.setValidateAfterInactivity(TimeValue.ofDays(20));
+            connectionManager.setDefaultMaxPerRoute(maxConnectionPerRoute);
+            connectionManager.setMaxPerRoute(new HttpRoute(httpHost), maxConnectionPerRoute);
+
+
+            HttpClient httpclient = HttpClients.custom().setConnectionManager(connectionManager).build();
+
+            HttpComponentsClientHttpRequestFactory httpReqFactory = new HttpComponentsClientHttpRequestFactory(httpclient);
+//            httpReqFactory.setReadTimeout(readTimeoutSeconds * 1000);
+            httpReqFactory.setConnectionRequestTimeout(connectTimeoutSeconds * 1000);
+            httpReqFactory.setConnectTimeout(connectTimeoutSeconds * 1000);
+
+            restTemplate = new RestTemplateBuilder(rt -> rt.getInterceptors().add((request, body, execution) -> {
+                request.getHeaders().add("Authorization-key", customerServiceAuthorization);
+                return execution.execute(request, body);
+            })).uriTemplateHandler(new DefaultUriBuilderFactory(apiHost))
+                    .requestFactory(() -> httpReqFactory)
+                    .setConnectTimeout(Duration.ofSeconds(connectTimeoutSeconds))
+                    .setReadTimeout(Duration.ofSeconds(readTimeoutSeconds))
+                    .defaultHeader("Content-Type", "application/json")
+                    .build();
+        }
+        return restTemplate;
+    }
 }

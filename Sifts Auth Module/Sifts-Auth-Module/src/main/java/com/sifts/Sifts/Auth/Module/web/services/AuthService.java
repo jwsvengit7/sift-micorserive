@@ -7,5 +7,5 @@ import com.sifts.Commons.model.response.CoreResponse;
 
 public interface AuthService {
     public APIResponse<CoreResponse> loginToBranic(AuthLoginRequest request);
-    public APIResponse<CoreResponse> createAccountBranic(AuthRegisterRequest request);
+    public CoreResponse createAccountBranic(AuthRegisterRequest request);
 }

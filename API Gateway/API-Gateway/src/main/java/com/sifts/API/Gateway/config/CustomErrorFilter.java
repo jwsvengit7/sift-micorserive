@@ -9,8 +9,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @Component
 public class CustomErrorFilter implements GatewayFilter, Ordered {
+    private final static Logger LOGGER = Logger.getLogger(CustomErrorFilter.class.getName());
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -19,7 +23,7 @@ public class CustomErrorFilter implements GatewayFilter, Ordered {
     }
 
     private Mono<Void> handleException(Throwable ex, ServerHttpResponse response) {
-        System.out.println(ex.getMessage());
+        LOGGER.info(Level.SEVERE+ ex.getMessage());
         response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
         return response.setComplete();
     }

@@ -19,4 +19,5 @@ public class AuthRegisterRequest {
     private String age;
     private String firsrtName;
     private String lastName;
+
 }

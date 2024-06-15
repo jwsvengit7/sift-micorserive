@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,8 +30,8 @@ import java.util.logging.Logger;
  */
 @Service
 @RequiredArgsConstructor
-public class AppUserServiceImpl  implements AppUserService {
-    private static final Logger LOGGER = Logger.getLogger(AppUserServiceImpl.class.getName());
+public class CoreServiceImpl  implements CoreService {
+    private static final Logger LOGGER = Logger.getLogger(CoreServiceImpl.class.getName());
 
     private final AppIDRepository appIDRepository;
     private final AppUserRepository appUserRepository;
@@ -40,27 +39,27 @@ public class AppUserServiceImpl  implements AppUserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public ResponseEntity<APIResponse<CoreResponse>>  getUser(Long id, HttpServletRequest request) {
+    public APIResponse<CoreResponse>  getUser(Long id, HttpServletRequest request) {
         return null;
     }
 
     @Override
-    public ResponseEntity<APIResponse<CoreResponse>>  createUser(AppUserRequest appUserRequest, HttpServletRequest request) {
+    public APIResponse<CoreResponse>  createUser(AppUserRequest appUserRequest, HttpServletRequest request) {
         boolean validateRequest = HeadersUtils.verifyHeaders(request);
         if(!validateRequest) {
-            return new ResponseEntity<>(mappResponse("UNABLE TO ACCESS HOST ", HttpStatus.INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
+            return mappResponse("UNABLE TO ACCESS HOST ", HttpStatus.INTERNAL_SERVER_ERROR);
         }
             if (Objects.isNull(appUserRequest)) {
-                return new ResponseEntity<>(mappResponse("appUserRequest is null", HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
+                return mappResponse("appUserRequest is null", HttpStatus.BAD_REQUEST);
             }
             AppID appChannel = appIDRepository.findByAppName(SecurityUtils.getLoginUser());
             LOGGER.info(">>>>>>> APP CHANNEL <<<<<<<<<<<<{}" + appChannel);
             if (Objects.isNull(appChannel)) {
-                return new ResponseEntity<>(mappResponse("You need to Verify Your Channel", HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
+                return mappResponse("You need to Verify Your Channel", HttpStatus.BAD_REQUEST);
             }
             AppUser appUser = appUserRepository.findByEmail(appUserRequest.getEmail());
             if (Objects.nonNull(appUser) || appUserRepository.existsByEmail(appUserRequest.getEmail())) {
-                return new ResponseEntity<>(mappResponse("User Already Exist", HttpStatus.CONFLICT), HttpStatus.CONFLICT);
+                return mappResponse("User Already Exist", HttpStatus.CONFLICT);
             }
             AppUser newUser = new AppUser();
             newUser.setAge(appUserRequest.getAge());
@@ -73,24 +72,24 @@ public class AppUserServiceImpl  implements AppUserService {
             newUser.setPhotoUrl(appUserRequest.getPhotoUrl());
             newUser.setPassword(passwordEncoder.encode(appUserRequest.getPassword()));
             appUserRepository.save(newUser);
-            return new ResponseEntity<>(mappResponse("SIFTS USER " + newUser.getName() + " CREATED", HttpStatus.CREATED), HttpStatus.CREATED);
+            return mappResponse("SIFTS USER " + newUser.getName() + " CREATED", HttpStatus.CREATED);
     }
 
     @Override
-    public ResponseEntity<APIResponse<CoreResponse>> login(AppIDRequest appIDRequest) {
+    public APIResponse<CoreResponse> login(AppIDRequest appIDRequest) {
 
         if(Objects.isNull(appIDRequest)) {
-            return new ResponseEntity<>(mappResponse("AppIDRequest is null",HttpStatus.BAD_REQUEST),HttpStatus.BAD_REQUEST);
+            return mappResponse("AppIDRequest is null",HttpStatus.BAD_REQUEST);
         }
             AppID appChannel = appIDRepository.findByAppNameAndAppPassword(appIDRequest.getAppName(),appIDRequest.getAppPassword());
         LOGGER.info(">>>>>>> APP CHANNEL <<<<<<<<<<<< "+ appChannel);
             if(Objects.isNull(appChannel)){
-                return new ResponseEntity<>(mappResponse("Channel is null",HttpStatus.BAD_REQUEST),HttpStatus.BAD_REQUEST);
+                return mappResponse("Channel is null",HttpStatus.BAD_REQUEST);
             }
             Authentication authentication = new UsernamePasswordAuthenticationToken(appIDRequest.getAppName(),appIDRequest.getAppPassword());
             String jwtToken = jwtService.generateToken(authentication);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            return new ResponseEntity<>(mappResponse(jwtToken,HttpStatus.OK),HttpStatus.OK);
+            return mappResponse(jwtToken,HttpStatus.OK);
         }
 
     private <T> APIResponse<CoreResponse> mappResponse(T data,HttpStatus status){

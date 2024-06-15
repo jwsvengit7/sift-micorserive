@@ -12,4 +12,14 @@ import lombok.Setter;
 public class AuthLoginRequest {
     private String email;
     private String password;
+    private AppDetails appDetails;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AppDetails{
+        private String appName;
+        private String appPassword;
+    }
 }

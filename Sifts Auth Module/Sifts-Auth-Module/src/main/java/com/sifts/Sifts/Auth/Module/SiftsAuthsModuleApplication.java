@@ -8,10 +8,10 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @SpringBootApplication
 @EnableDiscoveryClient
 @EnableCaching
-public class SiftsAuthModuleApplication {
+public class SiftsAuthsModuleApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SiftsAuthModuleApplication.class, args);
+		SpringApplication.run(SiftsAuthsModuleApplication.class, args);
 	}
 
 }

@@ -51,9 +51,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
 
                 exchange.getRequest().mutate()
-                        .header("", "APPID")
-                        .header("", "KEYS")
-                        .header("", "APP_SECRET")
+                        .header("APPID", "SIFTS")
                         .build();
             }
             return chain.filter(exchange);

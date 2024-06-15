@@ -9,19 +9,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.*;
 import java.util.function.Function;
 
-@Configuration
+
 public class JwtService {
-    @Value("${jwt.expiration}")
-    private long EXPIRATION_DATE;
-    @Value("${jwt.refresh_token}")
-    private long REFRESH_TOKEN;
-    @Value("${jwt.secretkey}")
-    private String SECRET_KEY;
+    private final long EXPIRATION_DATE = 604800000;
+    private final long REFRESH_TOKEN = 86400000;
+    private final String SECRET_KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970ARN304N39FR3NRF44";
+
 
     public String extractUsername(String token) {
         return extractClaims(token, Claims::getSubject);
